@@ -23,7 +23,7 @@ class LatexTemplate
 		# Replace macros
 		@file_content.sub!(/\\title\{(.*?)\}/i, "\\title{#{doc_title}}") unless @doc_title.nil?
 		@file_content.sub!(/\\author\{(.*?)\}/i, "\\author{#{doc_author}}") unless @doc_author.nil?
-		@file_content.sub!(/\\date\{(.*?)\}/i, "\\date{#{doc_date}}") unless @doc_date.nil?
+		@file_content.sub!(/\\date\{(.*?)\}/i, "\\date{#{doc_date.strftime("%A %B %d, %Y")}}") unless @doc_date.nil?
 	end
 	
 	def save(filename)

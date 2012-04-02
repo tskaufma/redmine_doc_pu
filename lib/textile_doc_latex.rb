@@ -21,28 +21,25 @@ module RedCloth::Formatters::LATEX_EX
 	def table_close(opts)
 		output  = "\\begin{table}[H]\n"
 		output << "  \\centering\n"
-		cols = "X" * @table[0].size if not draw_table_border_latex
-		cols = "|" + "X|" * @table[0].size if draw_table_border_latex
-		output << "  \\begin{tabularx}{\\textwidth}{#{cols}}\n"
+		cols = "l" * @table[0].size if not draw_table_border_latex
+		cols = "|" + "l|" * @table[0].size if draw_table_border_latex
+		output << "  \\begin{tabular}{#{cols}}\n"
 		output << "   \\hline \n" if draw_table_border_latex
 		@table.each do |row|
 			hline = (draw_table_border_latex ? "\\hline" : "")
 			output << "    #{row.join(" & ")} \\\\ #{hline} \n"
 		end
-		output << "  \\end{tabularx}\n"
+		output << "  \\end{tabular}\n"
 		output << "\\end{table}\n"
 		output
 	end
 
 	def image(opts)
 		opts[:alt] = opts[:src]
-		
 		# Don't know how to use remote links, plus can we trust them?
 		return "" if opts[:src] =~ /^\w+\:\/\//
 		# Resolve CSS styles if any have been set
-		#styling = opts[:class].to_s.split(/\s+/).collect { |style| latex_image_styles[style] }.compact.join ','
-		styling = "width=\\textwidth";
-		Logger.new("/tmp/latex.log").info latex_image_styles
+		styling = opts[:class].to_s.split(/\s+/).collect { |style| latex_image_styles[style] }.compact.join ','
 		# Build latex code
 		[ "\\begin{figure}[#{(opts[:align].nil? ? "H" : "htb")}]",
 		  "  \\centering",
@@ -66,15 +63,15 @@ module RedClothExtensionLatex
 				code = $2
 				lang = "{#{$1}}"
 			end
-			"<notextile>\\begin{lstlisting}[language=#{lang}]#{code}\\end{lstlisting}\n</notextile>"
+			"<notextile>\\lstset{breaklines}\n\\begin{lstlisting}[language=#{lang}]#{code}\\end{lstlisting}\n</notextile>"
 		end
 	end
 
 	def latex_page_ref(text)
 		text.gsub!(/(\s|^)\[\[(.*?)(\|(.*?)|)\]\]/i) do |m|
 			var = $2
-			label = $2.gsub(/_/, ' ')
-			"<notextile> #{label} (page \\ref{chapter:#{var}})</notextile>"
+			label = $4
+			"<notextile> #{label} \\ref{page:#{var}}</notextile>"
 		end
 	end
 
